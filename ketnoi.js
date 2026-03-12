@@ -2,7 +2,7 @@
    Tệp: ketnoi.js - Trạm kết nối Github Pages <-> Google Apps Script
    ========================================================================== */
 
-const WEB_APP_URL = "ĐIỀN_LINK_WEB_APP_CỦA_THẦY_VÀO_ĐÂY"; 
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx2emnVfpuBaV7HrpYflIvYGcpjH2aKT9lfGfBROlj724lhVU_4oWJ32sBuUl4Vb_rA/exec"; 
 
 // Biến toàn cục lấy email từ LocalStorage (do màn hình đăng nhập ghi vào)
 let USER_EMAIL = localStorage.getItem("SKT_USER_EMAIL") || "";
@@ -52,4 +52,5 @@ function executeBackend(action, argsArray, onSuccess, onFailure) {
     .catch(err => {
         if (onFailure) onFailure(err); else console.error("Lỗi Fetch:", err);
     });
+
 }
