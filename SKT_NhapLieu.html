@@ -85,6 +85,29 @@
   let currentRowUpload = null; 
   let rowToDelete = null; 
 
+  // --- HÀM LỌC SIÊU MẠNH: CHỐNG MỌI LỖI KHOẢNG TRẮNG, HOA THƯỜNG ---
+  function normStr(str) {
+      return String(str || "").toLowerCase().replace(/[\s\uFEFF\xA0]+/g, '');
+  }
+
+  // --- HÀM GÁN COMBOBOX THÔNG MINH ---
+  function setComboRobust(id, val) {
+      const el = document.getElementById(id);
+      if(!el) return;
+      const target = normStr(val);
+      for(let i = 0; i < el.options.length; i++) {
+          if(normStr(el.options[i].text) === target || normStr(el.options[i].value) === target) {
+              el.selectedIndex = i;
+              return;
+          }
+      }
+      // Bọc lót: Nếu không tìm thấy trong danh sách, ép hiển thị để không bị rỗng
+      if(val && val.trim() !== "") {
+          el.add(new Option(val, val));
+          el.value = val;
+      }
+  }
+
   function getCurrentDate() {
       const d = new Date();
       return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
@@ -138,8 +161,8 @@
   }
 
   function reCheckEditPermission(row) {
-      const nkt = String(document.getElementById('cbNguoiKiemTra').value || "").trim();
-      const isNKT = nktData.some(x => x.name.trim() === nkt && x.email === userEmail);
+      const nkt = document.getElementById('cbNguoiKiemTra').value;
+      const isNKT = nktData.some(x => normStr(x.name) === normStr(nkt) && normStr(x.email) === normStr(userEmail));
       const editBtn = row.querySelector('.link-edit-corner');
       if(editBtn) {
           if(!isNKT) {
@@ -173,14 +196,13 @@
       fillComboSimple('cbBoPhan', Object.keys(bpData)); 
       updateMaHoSoCombo(); 
 
-      // TÍNH NĂNG PHÂN QUYỀN: KHÓA TÊN GIÁO VIÊN
-      let myGVName = gvData.find(x => x.email === userEmail)?.name;
-      let myNKTName = nktData.find(x => x.email === userEmail)?.name;
+      // TÍNH NĂNG PHÂN QUYỀN: KHÓA TÊN GIÁO VIÊN BẰNG NORMSTR
+      let myGVName = gvData.find(x => normStr(x.email) === normStr(userEmail))?.name;
+      let myNKTName = nktData.find(x => normStr(x.email) === normStr(userEmail))?.name;
       
       if (myGVName && !myNKTName) {
-          const cbGV = document.getElementById('cbGiaoVien');
-          cbGV.value = myGVName;
-          cbGV.disabled = true; // Khóa chết 100%
+          setComboRobust('cbGiaoVien', myGVName);
+          document.getElementById('cbGiaoVien').disabled = true; // Khóa chết 100%
           updatePrefixAllRows();
           applyPermissions();
       }
@@ -202,12 +224,12 @@
             const isMultiRow = Array.isArray(r[0]); 
             const records = isMultiRow ? r : [r];
 
-            // TÍNH NĂNG PHÂN QUYỀN CHỐT CHẶN: KHÔNG CHO MỞ HỒ SƠ NGƯỜI KHÁC (Đã cắt khoảng trắng)
-            let myGVName = gvData.find(x => x.email === userEmail)?.name;
-            let myNKTName = nktData.find(x => x.email === userEmail)?.name;
-            const recordGV = String(records[0][0] || "").trim(); // Lọc sạch khoảng trắng
+            // TÍNH NĂNG PHÂN QUYỀN CHỐT CHẶN BẰNG NORMSTR
+            let myGVName = gvData.find(x => normStr(x.email) === normStr(userEmail))?.name;
+            let myNKTName = nktData.find(x => normStr(x.email) === normStr(userEmail))?.name;
+            const recordGV = String(records[0][0] || ""); 
 
-            if (myGVName && !myNKTName && recordGV !== myGVName) {
+            if (myGVName && !myNKTName && normStr(recordGV) !== normStr(myGVName)) {
                 showModal("⛔ BẠN CHỈ ĐƯỢC XEM VÀ KÝ NHẬN HỒ SƠ CỦA CHÍNH MÌNH!");
                 resetForm(); 
                 return;
@@ -223,22 +245,22 @@
   }
 
   function applyPermissions() {
-    // Đã thêm trim() để đọc chính xác tuyệt đối tên người trên Form
-    const gv = String(document.getElementById('cbGiaoVien').value || "").trim();
-    const nkt = String(document.getElementById('cbNguoiKiemTra').value || "").trim();
+    const gv = document.getElementById('cbGiaoVien').value;
+    const nkt = document.getElementById('cbNguoiKiemTra').value;
     const btnSave = document.getElementById('btnSave');
     const btnSubmit = document.getElementById('btnSubmit');
     const btnAddContainer = document.querySelector('.add-row-container'); 
     
-    // Tách biệt quyền: Kiểm tra chính xác ai đang đăng nhập
-    const isGV = gvData.some(x => x.name.trim() === gv && x.email === userEmail);
-    const isNKT = nktData.some(x => x.name.trim() === nkt && x.email === userEmail);
+    // So sánh quyền bằng hàm normStr để miễn nhiễm khoảng trắng
+    const myMail = normStr(userEmail);
+    const isGV = gvData.some(x => normStr(x.name) === normStr(gv) && normStr(x.email) === myMail);
+    const isNKT = nktData.some(x => normStr(x.name) === normStr(nkt) && normStr(x.email) === myMail);
 
-    // Quyền của Người Kiểm Tra
+    // Quyền của Người Kiểm Tra (Nút Submit, Thêm dòng)
     if (isNKT) { btnSubmit.disabled = false; btnSubmit.style.opacity = "1"; } 
     else { btnSubmit.disabled = true; btnSubmit.style.opacity = "0.5"; }
 
-    // Quyền chung (Cả 2 đều được lưu nhật ký)
+    // Quyền lưu tạm chung
     if (isGV || isNKT) { btnSave.disabled = false; btnSave.style.opacity = "1"; } 
     else { btnSave.disabled = true; btnSave.style.opacity = "0.5"; }
 
@@ -247,17 +269,17 @@
     document.querySelectorAll('#tableContent tr').forEach(row => {
         const ins = row.querySelectorAll('.cell-input');
         ins.forEach((c, i) => {
-            const isYkienHoacKyTen = (i === 9 || i === 10);
+            const isYkienHoacKyTen = (i === 9 || i === 10); // Cột Ý kiến (9), Ký tên (10)
             
-            // Xử lý bật/tắt từng cột dựa trên đúng quyền hạn
+            // MA TRẬN PHÂN QUYỀN MỚI
             if (isGV && isNKT) {
-                c.disabled = false; // Kiêm 2 vai trò: Sửa tất cả
+                c.disabled = false; // Vừa dạy vừa kiểm tra: Mở full
             } else if (isGV) {
-                c.disabled = !isYkienHoacKyTen; // Giáo viên: CHỈ MỞ KHÓA cột Ý kiến (9) và Ký tên (10)
+                c.disabled = !isYkienHoacKyTen; // CHỈ LÀ GIÁO VIÊN: Mở khóa cột 9, 10
             } else if (isNKT) {
-                c.disabled = isYkienHoacKyTen; // Người KT: Khóa cột 9,10, mở khóa các cột còn lại
+                c.disabled = isYkienHoacKyTen; // CHỈ LÀ NGƯỜI KT: Khóa cột 9, 10
             } else {
-                c.disabled = true; // Không có quyền: Khóa toàn bộ
+                c.disabled = true; // Người lạ: Khóa sạch
             }
         });
         
@@ -349,8 +371,8 @@
     const gv = document.getElementById('cbGiaoVien').value;
     const nkt = document.getElementById('cbNguoiKiemTra').value;
     if (!gv || !nkt) return false;
-    const eGV = gvData.find(x => x.name === gv)?.email;
-    const eNKT = nktData.find(x => x.name === nkt)?.email;
+    const eGV = gvData.find(x => normStr(x.name) === normStr(gv))?.email;
+    const eNKT = nktData.find(x => normStr(x.name) === normStr(nkt))?.email;
     if (eGV && eNKT && eGV === eNKT) {
       showModal("⚠️ LỖI: Email người kiểm tra và giáo viên trùng nhau!");
       document.getElementById(type === 'GV' ? 'cbGiaoVien' : 'cbNguoiKiemTra').value = ""; return true; 
@@ -374,12 +396,12 @@
       const el = document.getElementById(id); if(el) { el.value = ""; el.disabled = false; }
     });
     
-    let myGVName = gvData.find(x => x.email === userEmail)?.name;
-    let myNKTName = nktData.find(x => x.email === userEmail)?.name;
+    let myGVName = gvData.find(x => normStr(x.email) === normStr(userEmail))?.name;
+    let myNKTName = nktData.find(x => normStr(x.email) === normStr(userEmail))?.name;
     const cbGV = document.getElementById('cbGiaoVien');
 
     if (myGVName && !myNKTName) {
-        cbGV.value = myGVName;
+        setComboRobust('cbGiaoVien', myGVName);
         cbGV.disabled = true;
     } else {
         cbGV.value = "";
@@ -434,10 +456,10 @@
     if(!records || records.length === 0) return;
     const r0 = records[0];
     
-    // Ép kiểu chuẩn: Xóa bỏ mọi khoảng trắng thừa trong CSDL để Web nhận diện được đúng người
-    document.getElementById('cbGiaoVien').value = String(r0[0]||"").trim(); 
-    document.getElementById('cbNguoiKiemTra').value = String(r0[1]||"").trim();
-    document.getElementById('cbBoPhan').value = String(r0[2]||"").trim(); 
+    // Gán dữ liệu thông minh, tránh tuyệt đối lỗi khoảng trắng của Sheet
+    setComboRobust('cbGiaoVien', r0[0]);
+    setComboRobust('cbNguoiKiemTra', r0[1]);
+    setComboRobust('cbBoPhan', r0[2]);
     document.getElementById('txtMaBoPhan').value = String(r0[3]||"").trim();
     
     document.getElementById('tableContent').innerHTML = "";
@@ -455,8 +477,8 @@
   }
 
   function removeRow(btn) {
-      const nkt = String(document.getElementById('cbNguoiKiemTra').value || "").trim();
-      const isNKT = nktData.some(x => x.name.trim() === nkt && x.email === userEmail);
+      const nkt = document.getElementById('cbNguoiKiemTra').value;
+      const isNKT = nktData.some(x => normStr(x.name) === normStr(nkt) && normStr(x.email) === normStr(userEmail));
       if (!isNKT) { showModal("⚠️ Bạn không có quyền xóa dòng này!"); return; }
       const tbody = document.getElementById('tableContent');
       if(tbody.rows.length <= 1) { showModal("⚠️ Phải giữ lại ít nhất một dòng!"); return; }
