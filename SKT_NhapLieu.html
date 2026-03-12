@@ -81,16 +81,16 @@
 </div>
 
 <script>
-  let userEmail = "", gvData = [], nktData = [], bpData = {}, maHoSoData = [];
+  let userEmail = window.SKT_GLOBAL_EMAIL || sessionStorage.getItem("SKT_USER_EMAIL") || ""; 
+  let gvData = [], nktData = [], bpData = {}, maHoSoData = [];
   let currentRowUpload = null; 
   let rowToDelete = null; 
 
-  // --- HÀM LỌC SIÊU MẠNH: CHỐNG MỌI LỖI KHOẢNG TRẮNG, HOA THƯỜNG ---
   function normStr(str) {
-      return String(str || "").toLowerCase().replace(/[\s\uFEFF\xA0]+/g, '');
+      if (!str) return "";
+      return String(str).normalize("NFC").toLowerCase().replace(/[\s\uFEFF\xA0]+/g, '');
   }
 
-  // --- HÀM GÁN COMBOBOX THÔNG MINH ---
   function setComboRobust(id, val) {
       const el = document.getElementById(id);
       if(!el) return;
@@ -101,10 +101,9 @@
               return;
           }
       }
-      // Bọc lót: Nếu không tìm thấy trong danh sách, ép hiển thị để không bị rỗng
       if(val && val.trim() !== "") {
           el.add(new Option(val, val));
-          el.value = val;
+          el.selectedIndex = el.options.length - 1; // Bắt buộc chọn chính xác
       }
   }
 
@@ -161,8 +160,11 @@
   }
 
   function reCheckEditPermission(row) {
+      const myMail = normStr(window.SKT_GLOBAL_EMAIL || sessionStorage.getItem("SKT_USER_EMAIL") || userEmail);
+      const myNKTName = nktData.find(x => normStr(x.email) === myMail)?.name;
       const nkt = document.getElementById('cbNguoiKiemTra').value;
-      const isNKT = nktData.some(x => normStr(x.name) === normStr(nkt) && normStr(x.email) === normStr(userEmail));
+      const isNKT = (myNKTName && normStr(myNKTName) === normStr(nkt));
+      
       const editBtn = row.querySelector('.link-edit-corner');
       if(editBtn) {
           if(!isNKT) {
@@ -172,8 +174,6 @@
           }
       }
   }
-
-  window.onload = () => { addNewRow(); loadData(); if(typeof loadFolders === 'function') loadFolders(); };
 
   function loadData() {
     toggleSpin('initial', true);
@@ -185,7 +185,9 @@
           toggleSpin('initial', false);
           return; 
       }
-      userEmail = data.currentUserEmail; 
+      
+      // Đồng bộ email toàn cục 
+      if(data.currentUserEmail) userEmail = data.currentUserEmail; 
       gvData = data.giaoVienData; 
       nktData = data.nguoiKTData; 
       bpData = data.boPhanData; 
@@ -196,13 +198,13 @@
       fillComboSimple('cbBoPhan', Object.keys(bpData)); 
       updateMaHoSoCombo(); 
 
-      // TÍNH NĂNG PHÂN QUYỀN: KHÓA TÊN GIÁO VIÊN BẰNG NORMSTR
-      let myGVName = gvData.find(x => normStr(x.email) === normStr(userEmail))?.name;
-      let myNKTName = nktData.find(x => normStr(x.email) === normStr(userEmail))?.name;
+      let myMail = normStr(window.SKT_GLOBAL_EMAIL || sessionStorage.getItem("SKT_USER_EMAIL") || userEmail);
+      let myGVName = gvData.find(x => normStr(x.email) === myMail)?.name;
+      let myNKTName = nktData.find(x => normStr(x.email) === myMail)?.name;
       
       if (myGVName && !myNKTName) {
           setComboRobust('cbGiaoVien', myGVName);
-          document.getElementById('cbGiaoVien').disabled = true; // Khóa chết 100%
+          document.getElementById('cbGiaoVien').disabled = true; 
           updatePrefixAllRows();
           applyPermissions();
       }
@@ -224,9 +226,9 @@
             const isMultiRow = Array.isArray(r[0]); 
             const records = isMultiRow ? r : [r];
 
-            // TÍNH NĂNG PHÂN QUYỀN CHỐT CHẶN BẰNG NORMSTR
-            let myGVName = gvData.find(x => normStr(x.email) === normStr(userEmail))?.name;
-            let myNKTName = nktData.find(x => normStr(x.email) === normStr(userEmail))?.name;
+            let myMail = normStr(window.SKT_GLOBAL_EMAIL || sessionStorage.getItem("SKT_USER_EMAIL") || userEmail);
+            let myGVName = gvData.find(x => normStr(x.email) === myMail)?.name;
+            let myNKTName = nktData.find(x => normStr(x.email) === myMail)?.name;
             const recordGV = String(records[0][0] || ""); 
 
             if (myGVName && !myNKTName && normStr(recordGV) !== normStr(myGVName)) {
@@ -244,23 +246,29 @@
     } else applyPermissions();
   }
 
+  // --- HÀM PHÂN QUYỀN MỚI: BẺ KHÓA TRÌNH DUYỆT ---
   function applyPermissions() {
-    const gv = document.getElementById('cbGiaoVien').value;
-    const nkt = document.getElementById('cbNguoiKiemTra').value;
+    const cbGV = document.getElementById('cbGiaoVien');
+    const cbNKT = document.getElementById('cbNguoiKiemTra');
+    
+    // Đọc chính xác giá trị dù bị mờ (disabled)
+    const gv = String(cbGV.options[cbGV.selectedIndex]?.text || cbGV.value || "").trim();
+    const nkt = String(cbNKT.options[cbNKT.selectedIndex]?.text || cbNKT.value || "").trim();
+    
     const btnSave = document.getElementById('btnSave');
     const btnSubmit = document.getElementById('btnSubmit');
     const btnAddContainer = document.querySelector('.add-row-container'); 
     
-    // So sánh quyền bằng hàm normStr để miễn nhiễm khoảng trắng
-    const myMail = normStr(userEmail);
-    const isGV = gvData.some(x => normStr(x.name) === normStr(gv) && normStr(x.email) === myMail);
-    const isNKT = nktData.some(x => normStr(x.name) === normStr(nkt) && normStr(x.email) === myMail);
+    const myMail = normStr(window.SKT_GLOBAL_EMAIL || sessionStorage.getItem("SKT_USER_EMAIL") || userEmail);
+    const myGVName = gvData.find(x => normStr(x.email) === myMail)?.name;
+    const myNKTName = nktData.find(x => normStr(x.email) === myMail)?.name;
 
-    // Quyền của Người Kiểm Tra (Nút Submit, Thêm dòng)
+    const isGV = (myGVName && normStr(myGVName) === normStr(gv));
+    const isNKT = (myNKTName && normStr(myNKTName) === normStr(nkt));
+
     if (isNKT) { btnSubmit.disabled = false; btnSubmit.style.opacity = "1"; } 
     else { btnSubmit.disabled = true; btnSubmit.style.opacity = "0.5"; }
 
-    // Quyền lưu tạm chung
     if (isGV || isNKT) { btnSave.disabled = false; btnSave.style.opacity = "1"; } 
     else { btnSave.disabled = true; btnSave.style.opacity = "0.5"; }
 
@@ -269,17 +277,19 @@
     document.querySelectorAll('#tableContent tr').forEach(row => {
         const ins = row.querySelectorAll('.cell-input');
         ins.forEach((c, i) => {
-            const isYkienHoacKyTen = (i === 9 || i === 10); // Cột Ý kiến (9), Ký tên (10)
+            const isYkienHoacKyTen = (i === 9 || i === 10); 
             
-            // MA TRẬN PHÂN QUYỀN MỚI
+            // Ép buộc trình duyệt xóa bỏ lệnh khóa bằng removeAttribute
             if (isGV && isNKT) {
-                c.disabled = false; // Vừa dạy vừa kiểm tra: Mở full
+                c.removeAttribute('disabled');
             } else if (isGV) {
-                c.disabled = !isYkienHoacKyTen; // CHỈ LÀ GIÁO VIÊN: Mở khóa cột 9, 10
+                if (isYkienHoacKyTen) c.removeAttribute('disabled');
+                else c.setAttribute('disabled', 'true');
             } else if (isNKT) {
-                c.disabled = isYkienHoacKyTen; // CHỈ LÀ NGƯỜI KT: Khóa cột 9, 10
+                if (!isYkienHoacKyTen) c.removeAttribute('disabled');
+                else c.setAttribute('disabled', 'true');
             } else {
-                c.disabled = true; // Người lạ: Khóa sạch
+                c.setAttribute('disabled', 'true');
             }
         });
         
@@ -396,8 +406,9 @@
       const el = document.getElementById(id); if(el) { el.value = ""; el.disabled = false; }
     });
     
-    let myGVName = gvData.find(x => normStr(x.email) === normStr(userEmail))?.name;
-    let myNKTName = nktData.find(x => normStr(x.email) === normStr(userEmail))?.name;
+    let myMail = normStr(window.SKT_GLOBAL_EMAIL || sessionStorage.getItem("SKT_USER_EMAIL") || userEmail);
+    let myGVName = gvData.find(x => normStr(x.email) === myMail)?.name;
+    let myNKTName = nktData.find(x => normStr(x.email) === myMail)?.name;
     const cbGV = document.getElementById('cbGiaoVien');
 
     if (myGVName && !myNKTName) {
@@ -456,7 +467,6 @@
     if(!records || records.length === 0) return;
     const r0 = records[0];
     
-    // Gán dữ liệu thông minh, tránh tuyệt đối lỗi khoảng trắng của Sheet
     setComboRobust('cbGiaoVien', r0[0]);
     setComboRobust('cbNguoiKiemTra', r0[1]);
     setComboRobust('cbBoPhan', r0[2]);
@@ -477,8 +487,11 @@
   }
 
   function removeRow(btn) {
+      const myMail = normStr(window.SKT_GLOBAL_EMAIL || sessionStorage.getItem("SKT_USER_EMAIL") || userEmail);
+      const myNKTName = nktData.find(x => normStr(x.email) === myMail)?.name;
       const nkt = document.getElementById('cbNguoiKiemTra').value;
-      const isNKT = nktData.some(x => normStr(x.name) === normStr(nkt) && normStr(x.email) === normStr(userEmail));
+      const isNKT = (myNKTName && normStr(myNKTName) === normStr(nkt));
+      
       if (!isNKT) { showModal("⚠️ Bạn không có quyền xóa dòng này!"); return; }
       const tbody = document.getElementById('tableContent');
       if(tbody.rows.length <= 1) { showModal("⚠️ Phải giữ lại ít nhất một dòng!"); return; }
