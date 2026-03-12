@@ -193,6 +193,7 @@
       const email = payload.email;
       
       sessionStorage.setItem("SKT_USER_EMAIL", email);
+      window.SKT_GLOBAL_EMAIL = email; // CHỐT QUYỀN TOÀN CỤC NGAY LẬP TỨC
       
       document.getElementById('login-overlay').style.display = 'none';
       document.getElementById('instant-loader').style.display = 'flex';
@@ -211,18 +212,21 @@
 
     function logoutGoogle() {
       sessionStorage.removeItem("SKT_USER_EMAIL");
+      window.SKT_GLOBAL_EMAIL = null;
       location.reload(); 
     }
 
     window.onload = function() {
-      if(sessionStorage.getItem("SKT_USER_EMAIL")) {
+      const storedEmail = sessionStorage.getItem("SKT_USER_EMAIL");
+      if(storedEmail) {
+        window.SKT_GLOBAL_EMAIL = storedEmail; // CHỐT QUYỀN TOÀN CỤC KHI F5
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('instant-loader').style.display = 'flex';
         loadSystemModules();
       }
     };
 
-    // --- TẢI CÁC MODULE HTML VỚI CHỐT CHẶN VÀ CHỐNG CACHE ---
+    // --- TẢI CÁC MODULE HTML ---
     async function loadSystemModules() {
       try {
         const cacheBuster = "?v=" + new Date().getTime(); 
@@ -245,20 +249,14 @@
         executeScripts(document.getElementById('TabTimKiem'));
         executeScripts(document.getElementById('MinhChungContainer'));
 
-        // ĐÁNH THỨC DỮ LIỆU CỦA TAB GHI SỔ (GỌI ĐÍCH DANH HÀM CHẮC CHẮN 100%)
         setTimeout(() => {
-            try { if (typeof loadData === 'function') loadData(); } catch(e) { console.log(e); }
-            try { if (typeof loadFolders === 'function') loadFolders(); } catch(e) { console.log(e); }
-            try { 
-                // Kiểm tra nếu bảng chưa có dòng nào thì mới thêm để tránh trùng lặp
-                if (typeof addNewRow === 'function' && document.getElementById('tableContent').rows.length === 0) {
-                    addNewRow(); 
-                }
-            } catch(e) { console.log(e); }
+            try { if (typeof loadData === 'function') loadData(); } catch(e) {}
+            try { if (typeof loadFolders === 'function') loadFolders(); } catch(e) {}
+            try { if (typeof addNewRow === 'function' && document.getElementById('tableContent').rows.length === 0) addNewRow(); } catch(e) {}
         }, 800);
 
       } catch (e) {
-        alert("LỖI KẾT NỐI TỆP: " + e.message + " trên Github!\n\nThầy hãy kiểm tra lại xem tên file trên GitHub đã có đúng đuôi .html và chính xác chữ hoa, chữ thường chưa nhé!");
+        alert("LỖI KẾT NỐI TỆP: " + e.message);
       }
 
       setTimeout(function() { 
@@ -287,4 +285,3 @@
   </script>
 </body>
 </html>
-
