@@ -4,19 +4,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sổ Kiểm Tra - TH&THCS Hợp Thành</title>
+  
   <script src="ketnoi.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
-    /* BẢO TOÀN TOÀN BỘ CSS THIẾT KẾ CỦA THẦY */
+    /* BẢO TOÀN CSS CŨ CỦA THẦY */
     #instant-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 2147483647; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .spinner-ring { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #1e3a8a; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
     .loader-text { font-family: 'Segoe UI', sans-serif; font-weight: bold; color: #1e3a8a; letter-spacing: 1px; font-size: 14px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    #main-wrapper { opacity: 0; transition: opacity 0.5s ease; display: none; } 
+    
+    #main-wrapper { opacity: 0; transition: opacity 0.5s ease; display: none; } /* Ẩn hệ thống khi chưa đăng nhập */
+    
+    /* CSS Màn hình Đăng nhập */
     #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0fdf4; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: "Times New Roman", serif; }
     .login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid #1e3a8a; }
     .login-logo { width: 80px; height: 80px; margin-bottom: 15px; }
+    
     .dev-badge-container { display: flex; align-items: center; background: linear-gradient(135deg, #1e3a8a 0%, #b91c1c 100%); padding: 4px 12px; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.3); transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden; }
     .dev-icon-fly { font-size: 16px; margin-right: 8px; animation: bounce 2s infinite; }
     .dev-text-group { display: flex; flex-direction: column; text-align: right; line-height: 1.1; }
@@ -25,6 +30,7 @@
     @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
     :root { --primary-blue: #1e3a8a; --brand-red: #b91c1c; --grid-border: #9ca3af; --step-gray: #d1d5db; --reset-color: #dc2626; --submit-green: #059669; }
     body { font-family: "Times New Roman", serif; background: #f3f4f6; padding: 16px; margin: 0; box-sizing: border-box; }
+    *, *:before, *:after { box-sizing: inherit; }
     .school-header { display: flex; align-items: center; justify-content: space-between; width: 1550px; max-width: 99%; margin: 0 auto 10px auto !important; }
     .logo-group { display: flex; align-items: center; }
     .school-logo { width: 1cm; height: 1cm; object-fit: contain; margin-right: 10px; padding: 0px; }
@@ -41,14 +47,21 @@
   </style>
 </head>
 <body>
+
   <div id="login-overlay">
     <div class="login-box">
       <img src="https://i.ibb.co/SXSKh9xM/Logo-m-i-c-a-tr-ng-H-p-Th-Nh.png" class="login-logo">
       <h2 style="color: #b91c1c; margin-top: 0; text-transform: uppercase;">Sổ Kiểm Tra Nội Bộ</h2>
       <h3 style="color: #1e3a8a; margin-bottom: 25px;">Trường TH&THCS Hợp Thành</h3>
       <p style="font-size: 14px; color: #666; font-style: italic; margin-bottom: 20px;">Hệ thống yêu cầu xác thực bằng Email được cấp quyền</p>
-      <div id="g_id_onload" data-client_id="148147324590-l5v7bjb5k03gkbs0s9cqk1t90093i028.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+      
+      <div id="g_id_onload"
+           data-client_id="148147324590-l5v7bjb5k03gkbs0s9cqk1t90093i028.apps.googleusercontent.com"
+           data-callback="handleCredentialResponse"
+           data-auto_prompt="false">
+      </div>
       <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="center"></div>
+      
       <div style="margin-top: 30px; font-size: 12px; color: #999; font-weight: bold;">Thiết kế: HOÀNG NGỌC LÂM</div>
     </div>
   </div>
@@ -56,15 +69,6 @@
   <div id="instant-loader" style="display: none;">
     <div class="spinner-ring"></div>
     <div class="loader-text">ĐANG KẾT NỐI HỆ THỐNG...</div>
-  </div>
-
-  <div id="access_denied_msg" style="display:none; text-align:center; margin-top:100px;">
-    <div style="background: white; display: inline-block; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid #b91c1c;">
-        <h1 style="color:#b91c1c; font-size: 50px; margin: 0;">⛔</h1>
-        <h2 style="color:#b91c1c; text-transform: uppercase;">Truy cập bị từ chối</h2>
-        <p id="denied_reason" style="font-weight:bold; color: #333; font-size: 16px; white-space: pre-line;"></p>
-        <button onclick="logoutGoogle()" style="margin-top: 20px; padding: 10px 25px; background: #1e3a8a; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">ĐĂNG NHẬP TÀI KHOẢN KHÁC</button>
-    </div>
   </div>
 
   <div id="main-wrapper">
@@ -81,6 +85,7 @@
         </div>
       </div>
     </div>
+
     <div id="so_wrapper">
       <div class="tab-container">
         <button class="tab-button active" onclick="switchTab('TabNhapLieu', this)">📝 GHI SỔ</button>
@@ -88,6 +93,7 @@
         <button class="tab-button" onclick="switchTab('TabHuongDan', this)">ℹ️ HƯỚNG DẪN</button>
         <button class="tab-button" onclick="logoutGoogle()" style="margin-left:auto; color:#dc2626; border-color:#fca5a5; background:#fef2f2;">🚪 ĐĂNG XUẤT</button>
       </div>
+      
       <div id="TabNhapLieu" class="tab-content active"></div>
       <div id="TabTimKiem" class="tab-content"></div>
       <div id="TabHuongDan" class="tab-content">
@@ -96,70 +102,125 @@
         <p><b> Tác giả: Hoàng Ngọc Lâm </b></p>
       </div>
     </div>
+
     <div id="MinhChungContainer"></div>
-    <div id="modal_overlay"><div id="modal_box"><h3>✅ THÔNG BÁO</h3><p id="modal_message"></p><button class="modal-btn" onclick="document.getElementById('modal_overlay').style.display='none'">ĐÓNG</button></div></div>
+
+    <div id="modal_overlay">
+      <div id="modal_box">
+        <h3>✅ THÔNG BÁO</h3>
+        <p id="modal_message"></p>
+        <button class="modal-btn" onclick="document.getElementById('modal_overlay').style.display='none'">ĐÓNG</button>
+      </div>
+    </div>
+    
+    <div id="access_denied_msg" style="display:none; text-align:center; margin-top:50px;">
+      <h2 style="color:#b91c1c;">⛔ TRUY CẬP BỊ TỪ CHỐI</h2>
+      <p id="denied_reason" style="font-weight:bold;"></p>
+      <button class="modal-btn" onclick="logoutGoogle()" style="background:#b91c1c; border:none; margin-top:20px;">ĐĂNG NHẬP TÀI KHOẢN KHÁC</button>
+    </div>
   </div>
 
   <script>
+    // --- XỬ LÝ ĐĂNG NHẬP GOOGLE ---
     function handleCredentialResponse(response) {
       const payload = decodeJwtResponse(response.credential);
-      sessionStorage.setItem("SKT_USER_EMAIL", payload.email);
-      window.SKT_GLOBAL_EMAIL = payload.email;
+      const email = payload.email;
+      
+      sessionStorage.setItem("SKT_USER_EMAIL", email);
+      window.SKT_GLOBAL_EMAIL = email; // CHỐT QUYỀN KHI ĐĂNG NHẬP LẦN ĐẦU
+      
       document.getElementById('login-overlay').style.display = 'none';
       document.getElementById('instant-loader').style.display = 'flex';
+      
       checkPermissionAndLoad();
     }
 
     function decodeJwtResponse(token) {
       let base64Url = token.split('.')[1];
       let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+      let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
     }
 
-    function logoutGoogle() { sessionStorage.removeItem("SKT_USER_EMAIL"); window.SKT_GLOBAL_EMAIL = null; location.reload(); }
+    function logoutGoogle() {
+      sessionStorage.removeItem("SKT_USER_EMAIL");
+      window.SKT_GLOBAL_EMAIL = null;
+      location.reload(); 
+    }
 
     window.onload = function() {
       const storedEmail = sessionStorage.getItem("SKT_USER_EMAIL");
       if(storedEmail) {
-        window.SKT_GLOBAL_EMAIL = storedEmail;
+        window.SKT_GLOBAL_EMAIL = storedEmail; // CHỐT QUYỀN KHI F5
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('instant-loader').style.display = 'flex';
         checkPermissionAndLoad();
       }
     };
 
+    // HÀM MỚI: HÀM KIỂM TRA PHÂN QUYỀN TẬP TRUNG TRƯỚC KHI TẢI FILE
     function checkPermissionAndLoad() {
       google.script.run.withSuccessHandler(data => {
         if (data.hasPermission === false) {
+          // BẬT THÔNG BÁO LỖI - Giấu các thành phần không liên quan
           document.getElementById('instant-loader').style.display = 'none';
-          document.getElementById('main-wrapper').style.display = 'none';
+          document.getElementById('main-wrapper').style.display = 'block';
+          setTimeout(() => { document.getElementById('main-wrapper').style.opacity = '1'; }, 50);
+          
+          document.querySelector('.school-header').style.display = 'none';
+          document.getElementById('so_wrapper').style.display = 'none';
+          document.getElementById('MinhChungContainer').style.display = 'none';
+          
+          // Kích hoạt khung báo lỗi chuẩn thiết kế của thầy
           document.getElementById('access_denied_msg').style.display = 'block';
           document.getElementById('denied_reason').innerText = data.message;
         } else {
+          // NẾU CÓ QUYỀN MỚI TẢI FILE
           loadSystemModules();
         }
       }).SKT_getInitialData();
     }
 
+    // --- TẢI CÁC MODULE HTML VỚI CHỐT CHẶN VÀ CHỐNG CACHE ---
     async function loadSystemModules() {
       try {
-        const cb = "?v=" + new Date().getTime(); 
-        const [resN, resT, resM] = await Promise.all([fetch('./SKT_NhapLieu.html'+cb), fetch('./SKT_TimKiem.html'+cb), fetch('./SKT_MinhChung.html'+cb)]);
-        document.getElementById('TabNhapLieu').innerHTML = await resN.text();
-        document.getElementById('TabTimKiem').innerHTML = await resT.text();
-        document.getElementById('MinhChungContainer').innerHTML = await resM.text();
+        const cacheBuster = "?v=" + new Date().getTime(); 
+        
+        const [resNhapLieu, resTimKiem, resMinhChung] = await Promise.all([
+            fetch('./SKT_NhapLieu.html' + cacheBuster),
+            fetch('./SKT_TimKiem.html' + cacheBuster),
+            fetch('./SKT_MinhChung.html' + cacheBuster)
+        ]);
+
+        if (!resNhapLieu.ok) throw new Error("Không tìm thấy file SKT_NhapLieu.html");
+        if (!resTimKiem.ok) throw new Error("Không tìm thấy file SKT_TimKiem.html");
+        if (!resMinhChung.ok) throw new Error("Không tìm thấy file SKT_MinhChung.html");
+
+        document.getElementById('TabNhapLieu').innerHTML = await resNhapLieu.text();
+        document.getElementById('TabTimKiem').innerHTML = await resTimKiem.text();
+        document.getElementById('MinhChungContainer').innerHTML = await resMinhChung.text();
+
         executeScripts(document.getElementById('TabNhapLieu'));
         executeScripts(document.getElementById('TabTimKiem'));
         executeScripts(document.getElementById('MinhChungContainer'));
+
         setTimeout(() => {
             try { if (typeof loadData === 'function') loadData(); } catch(e) {}
             try { if (typeof loadFolders === 'function') loadFolders(); } catch(e) {}
             try { if (typeof addNewRow === 'function' && document.getElementById('tableContent').rows.length === 0) addNewRow(); } catch(e) {}
-        }, 500);
-        document.getElementById('instant-loader').style.display = 'none'; 
-        document.getElementById('main-wrapper').style.display = 'block';
-        setTimeout(() => { document.getElementById('main-wrapper').style.opacity = '1'; }, 50);
-      } catch (e) { alert("LỖI TẢI HỆ THỐNG: " + e.message); }
+        }, 800);
+
+      } catch (e) {
+        alert("LỖI KẾT NỐI TỆP: " + e.message);
+      }
+
+      setTimeout(function() { 
+          document.getElementById('instant-loader').style.display = 'none'; 
+          document.getElementById('main-wrapper').style.display = 'block';
+          setTimeout(() => { document.getElementById('main-wrapper').style.opacity = '1'; }, 50);
+      }, 500); 
     }
 
     function executeScripts(element) {
