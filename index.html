@@ -9,41 +9,108 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
-    /* BẢO TOÀN CSS CŨ CỦA THẦY */
+    /* --- CSS MÀN HÌNH ĐĂNG NHẬP VÀ LOADER --- */
     #instant-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 2147483647; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .spinner-ring { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #1e3a8a; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
     .loader-text { font-family: 'Segoe UI', sans-serif; font-weight: bold; color: #1e3a8a; letter-spacing: 1px; font-size: 14px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     
-    #main-wrapper { opacity: 0; transition: opacity 0.5s ease; display: none; } /* Ẩn hệ thống khi chưa đăng nhập */
+    #main-wrapper { opacity: 0; transition: opacity 0.5s ease; display: none; } 
     
-    /* CSS Màn hình Đăng nhập */
     #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0fdf4; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: "Times New Roman", serif; }
     .login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid #1e3a8a; }
     .login-logo { width: 80px; height: 80px; margin-bottom: 15px; }
     
     .dev-badge-container { display: flex; align-items: center; background: linear-gradient(135deg, #1e3a8a 0%, #b91c1c 100%); padding: 4px 12px; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.3); transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden; }
+    .dev-badge-container:hover { transform: scale(1.02); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
     .dev-icon-fly { font-size: 16px; margin-right: 8px; animation: bounce 2s infinite; }
     .dev-text-group { display: flex; flex-direction: column; text-align: right; line-height: 1.1; }
-    .dev-name-label { font-weight: 800; font-size: 11px; color: #ffeb3b; text-transform: uppercase; font-family: 'Segoe UI', sans-serif; letter-spacing: 1px; }
-    .dev-role-label { font-size: 9px; color: #ffffff; opacity: 0.9; font-family: 'Segoe UI', sans-serif; }
+    .dev-name-label { font-weight: 800; font-size: 11px; color: #ffeb3b; text-transform: uppercase; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; letter-spacing: 1px; text-shadow: 1px 1px 1px rgba(0,0,0,0.3); }
+    .dev-role-label { font-size: 9px; color: #ffffff; opacity: 0.9; font-family: 'Segoe UI', sans-serif; letter-spacing: 0.5px; }
     @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+
+    /* --- CSS GỐC CỦA HỆ THỐNG SỔ KIỂM TRA --- */
     :root { --primary-blue: #1e3a8a; --brand-red: #b91c1c; --grid-border: #9ca3af; --step-gray: #d1d5db; --reset-color: #dc2626; --submit-green: #059669; }
     body { font-family: "Times New Roman", serif; background: #f3f4f6; padding: 16px; margin: 0; box-sizing: border-box; }
     *, *:before, *:after { box-sizing: inherit; }
+
     .school-header { display: flex; align-items: center; justify-content: space-between; width: 1550px; max-width: 99%; margin: 0 auto 10px auto !important; }
     .logo-group { display: flex; align-items: center; }
     .school-logo { width: 1cm; height: 1cm; object-fit: contain; margin-right: 10px; padding: 0px; }
     .school-name { font-weight: bold; font-size: 17px; color: var(--primary-blue); text-transform: uppercase; }
+    .loading-spin { background-image: url('https://i.gifer.com/ZKZg.gif') !important; background-repeat: no-repeat !important; background-position: right 8px center !important; background-size: 16px !important; background-color: #fffde7 !important; }
+    
     #so_wrapper { width: 1550px; max-width: 99%; margin: auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .table-container { overflow-x: auto; margin-top: 10px; border: 1px solid var(--grid-border); }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    th { background: #eff6ff; color: var(--primary-blue); border: 1px solid var(--grid-border); padding: 8px 4px; font-size: 14px; text-align: center; }
+    td { border: 1px solid var(--grid-border); vertical-align: middle; background: #fff; padding: 0; position: relative; } 
+    
+    .cell-input { width: 100%; border: none; padding: 8px 5px; font-family: "Times New Roman"; font-size: 15px; box-sizing: border-box; display: block; outline: none; resize: none; min-height: 35px; color: #000; }
+    .cell-input:disabled { background-color: #f1f5f9; color: #334155 !important; opacity: 1; -webkit-text-fill-color: #334155; }
+    .cell-input::placeholder { color: #94a3b8 !important; opacity: 0.5; font-style: italic; font-size: 13px; }
+    #mainTable .cell-input::placeholder { opacity: 0.4; }
+
+    textarea.cell-input { overflow: hidden; resize: none; padding-top: 5px; }
+    .f-input { padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
+    .filter-section { display: grid; grid-template-columns: 220px 220px 220px 120px 1fr; gap: 15px; margin-top: 15px; }
+    .f-item:nth-child(5) { grid-column: 5; display: flex; flex-direction: column; justify-self: end; text-align: right; }
+    .f-item:nth-child(5) .f-input { width: 180px; margin-left: auto; }
+    .f-item span { display: block; font-size: 14px; font-weight: bold; margin-bottom: 5px; color: #333; }
+
+    .btn-save { margin-top: 20px; padding: 12px 40px; background: var(--primary-blue); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; float: right; }
+    .btn-save:disabled { background-color: #ccc; cursor: not-allowed; }
+    .btn-row { padding: 4px 12px; color: white; border: none; border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: bold; margin-left: 10px; }
+    .btn-reset { background: var(--reset-color); }
+    .btn-submit { background: var(--submit-green); }
+    .refresh-btn { background: #3b82f6; color: white; border: none; border-radius: 4px; padding: 4px 10px; font-size: 12px; cursor: pointer; margin-left: 5px; }
+
+    .status-stepper { display: flex; align-items: center; margin-top: 10px; gap: 10px; font-size: 12px; border-top: 1px dashed #eee; padding-top: 3px; }
+    .step { padding: 4px 15px; border-radius: 20px; border: 1px solid var(--step-gray); transition: 0.3s; }
+    .step.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+    .step.completed { background: #10b981; color: white; border-color: #10b981; }
+    #user_display { margin-left: auto; font-style: italic; color: #64748b; font-size: 13px; }
+
+    .ma-ho-so-cell { font-size: 14px !important; font-weight: bold; text-align: center; vertical-align: middle; background: #f9fafb; padding: 8px 5px; }
+    .link-view-btn { display: inline-block; padding: 6px 15px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; font-weight: bold; font-size: 14px; text-decoration: none; border-radius: 4px; transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .link-view-btn:hover { background: #2563eb; color: white; border-color: #2563eb; }
+
+    .link-edit-corner { position: absolute; bottom: 2px; right: 2px; font-size: 11px; color: #d97706; cursor: pointer; opacity: 0.8; padding: 2px 4px; background: #fffbeb; border-radius: 3px; }
+    .link-edit-corner:hover { opacity: 1; font-weight: bold; background: #fef3c7; color: #b45309; }
+    .link-edit-corner.disabled { pointer-events: none; opacity: 0; display: none; }
+
     .tab-container { display: flex; margin-bottom: 5px; border-bottom: 2px solid #e5e7eb; }
     .tab-button { padding: 6px; background: #f3f4f6; border: 1px solid #e5e7eb; border-bottom: none; border-radius: 8px 8px 0 0; margin-right: 5px; font-weight: bold; color: #6b7280; cursor: pointer; }
     .tab-button.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
     .tab-content { display: none; padding-top: 15px; }
     .tab-content.active { display: block; }
+
     #modal_overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; }
     #modal_box { background: white; padding: 30px; border-radius: 10px; text-align: center; min-width: 300px; }
     .modal-btn { background: #2563eb; color: white; padding: 8px 20px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+
+    .btn-icon-del { background: none; border: none; cursor: pointer; color: #ef4444; font-size: 16px; padding: 4px; border-radius: 4px; }
+    .btn-icon-del:hover { background-color: #fee2e2; }
+    .btn-icon-del:disabled { color: #d1d5db; cursor: not-allowed; pointer-events: none; }
+    
+    .add-row-container { text-align: left; margin-top: 5px; padding-left: 5px; }
+    .btn-add-row { background-color: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-add-row:hover { background-color: #059669; }
+
+    .btn-upload-icon { background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 14px; }
+    .btn-upload-icon:disabled { opacity: 0.5; cursor: not-allowed; }
+    .evidence-uploaded { background-color: #f0fdf4; }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 99999; display: flex; justify-content: center; align-items: center; }
+    .modal-box { background: white; padding: 25px; border-radius: 8px; width: 400px; max-width: 90%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-align: center; font-family: Arial, sans-serif; animation: popIn 0.3s ease; }
+    .modal-title { color: #d32f2f; font-weight: bold; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .modal-text { font-size: 14px; color: #333; margin-bottom: 25px; line-height: 1.5; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .btn-cancel { padding: 8px 20px; border: 1px solid #ccc; background: #f1f1f1; color: #333; border-radius: 4px; cursor: pointer; }
+    .btn-cancel:hover { background: #e0e0e0; }
+    .btn-confirm { padding: 8px 20px; border: none; background: #d32f2f; color: white; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .btn-confirm:hover { background: #b71c1c; }
+    @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   </style>
 </head>
 <body>
@@ -158,7 +225,6 @@
     // --- TẢI CÁC MODULE HTML VỚI CHỐT CHẶN VÀ CHỐNG CACHE ---
     async function loadSystemModules() {
       try {
-        // Tuyệt chiêu chống Cache: Thêm chuỗi thời gian ngẫu nhiên vào đuôi link
         const cacheBuster = "?v=" + new Date().getTime(); 
         
         const [resNhapLieu, resTimKiem, resMinhChung] = await Promise.all([
@@ -209,5 +275,3 @@
   </script>
 </body>
 </html>
-
-
