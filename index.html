@@ -122,18 +122,14 @@
   <script>
     // --- XỬ LÝ ĐĂNG NHẬP GOOGLE ---
     function handleCredentialResponse(response) {
-      // 1. Giải mã token do Google trả về để lấy Email
       const payload = decodeJwtResponse(response.credential);
       const email = payload.email;
       
-      // 2. Lưu Email vào LocalStorage
       localStorage.setItem("SKT_USER_EMAIL", email);
       
-      // 3. Tắt màn hình đăng nhập, bật màn hình chờ
       document.getElementById('login-overlay').style.display = 'none';
       document.getElementById('instant-loader').style.display = 'flex';
       
-      // 4. Bắt đầu tải hệ thống
       loadSystemModules();
     }
 
@@ -148,10 +144,9 @@
 
     function logoutGoogle() {
       localStorage.removeItem("SKT_USER_EMAIL");
-      location.reload(); // Tải lại trang sẽ tự động bật lại màn hình đăng nhập
+      location.reload(); 
     }
 
-    // Kiểm tra xem đã đăng nhập từ phiên trước chưa
     window.onload = function() {
       if(localStorage.getItem("SKT_USER_EMAIL")) {
         document.getElementById('login-overlay').style.display = 'none';
@@ -160,14 +155,20 @@
       }
     };
 
-    // --- TẢI CÁC MODULE HTML (Giữ nguyên cấu trúc rời rạc của thầy) ---
+    // --- TẢI CÁC MODULE HTML VỚI CHỐT CHẶN BÁO LỖI ---
     async function loadSystemModules() {
       try {
+        // THÊM DẤU ./ ĐỂ ÉP ĐỌC FILE CÙNG THƯ MỤC
         const [resNhapLieu, resTimKiem, resMinhChung] = await Promise.all([
-            fetch('SKT_NhapLieu.html'),
-            fetch('SKT_TimKiem.html'),
-            fetch('SKT_MinhChung.html')
+            fetch('./SKT_NhapLieu.html'),
+            fetch('./SKT_TimKiem.html'),
+            fetch('./SKT_MinhChung.html')
         ]);
+
+        // CHỐT CHẶN: NẾU GITHUB TRẢ VỀ TRANG 404 THÌ DỪNG LẠI NGAY, KHÔNG ĐƯA VÀO GIAO DIỆN
+        if (!resNhapLieu.ok) throw new Error("Không tìm thấy file SKT_NhapLieu.html trên Github!");
+        if (!resTimKiem.ok) throw new Error("Không tìm thấy file SKT_TimKiem.html trên Github!");
+        if (!resMinhChung.ok) throw new Error("Không tìm thấy file SKT_MinhChung.html trên Github!");
 
         document.getElementById('TabNhapLieu').innerHTML = await resNhapLieu.text();
         document.getElementById('TabTimKiem').innerHTML = await resTimKiem.text();
@@ -178,7 +179,7 @@
         executeScripts(document.getElementById('MinhChungContainer'));
 
       } catch (e) {
-        alert("Lỗi tải giao diện! Vui lòng tải lại trang.");
+        alert("LỖI KẾT NỐI TỆP: " + e.message + "\n\nThầy hãy kiểm tra lại xem tên các file con trên GitHub đã ghi chính xác chữ hoa, chữ thường chưa nhé!");
       }
 
       setTimeout(function() { 
@@ -206,5 +207,4 @@
     }
   </script>
 </body>
-
 </html>
