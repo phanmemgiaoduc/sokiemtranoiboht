@@ -245,6 +245,13 @@
         executeScripts(document.getElementById('TabTimKiem'));
         executeScripts(document.getElementById('MinhChungContainer'));
 
+        // ĐÁNH THỨC DỮ LIỆU CỦA TAB GHI SỔ
+        setTimeout(() => {
+            if (typeof window.onload === 'function') {
+                window.onload(); 
+            }
+        }, 500);
+
       } catch (e) {
         alert("LỖI KẾT NỐI TỆP: " + e.message + " trên Github!\n\nThầy hãy kiểm tra lại xem tên file trên GitHub đã có đúng đuôi .html và chính xác chữ hoa, chữ thường chưa nhé!");
       }
