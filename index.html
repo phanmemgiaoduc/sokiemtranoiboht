@@ -245,12 +245,17 @@
         executeScripts(document.getElementById('TabTimKiem'));
         executeScripts(document.getElementById('MinhChungContainer'));
 
-        // ĐÁNH THỨC DỮ LIỆU CỦA TAB GHI SỔ
+        // ĐÁNH THỨC DỮ LIỆU CỦA TAB GHI SỔ (GỌI ĐÍCH DANH HÀM CHẮC CHẮN 100%)
         setTimeout(() => {
-            if (typeof window.onload === 'function') {
-                window.onload(); 
-            }
-        }, 500);
+            try { if (typeof loadData === 'function') loadData(); } catch(e) { console.log(e); }
+            try { if (typeof loadFolders === 'function') loadFolders(); } catch(e) { console.log(e); }
+            try { 
+                // Kiểm tra nếu bảng chưa có dòng nào thì mới thêm để tránh trùng lặp
+                if (typeof addNewRow === 'function' && document.getElementById('tableContent').rows.length === 0) {
+                    addNewRow(); 
+                }
+            } catch(e) { console.log(e); }
+        }, 800);
 
       } catch (e) {
         alert("LỖI KẾT NỐI TỆP: " + e.message + " trên Github!\n\nThầy hãy kiểm tra lại xem tên file trên GitHub đã có đúng đuôi .html và chính xác chữ hoa, chữ thường chưa nhé!");
@@ -282,3 +287,4 @@
   </script>
 </body>
 </html>
+
