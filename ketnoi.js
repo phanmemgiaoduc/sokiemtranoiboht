@@ -2,7 +2,7 @@
    Tệp: ketnoi.js - Trạm kết nối Github Pages <-> Google Apps Script
    ========================================================================== */
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx2emnVfpuBaV7HrpYflIvYGcpjH2aKT9lfGfBROlj724lhVU_4oWJ32sBuUl4Vb_rA/exec"; 
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxeQAXxsFNGjJlnnaimCshsK8wLVea9wnVePCR-ioB9Xr3Q4mVVUsDXIUIEYQ1vIZHb/exec"; 
 
 // Biến toàn cục lấy email từ LocalStorage (do màn hình đăng nhập ghi vào)
 let USER_EMAIL = sessionStorage.getItem("SKT_USER_EMAIL") || "";
@@ -54,4 +54,5 @@ function executeBackend(action, argsArray, onSuccess, onFailure) {
     });
 
 }
+
 
