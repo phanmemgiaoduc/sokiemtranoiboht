@@ -125,7 +125,7 @@
       const payload = decodeJwtResponse(response.credential);
       const email = payload.email;
       
-      localStorage.setItem("SKT_USER_EMAIL", email);
+      sessionStorage.setItem("SKT_USER_EMAIL", email);
       
       document.getElementById('login-overlay').style.display = 'none';
       document.getElementById('instant-loader').style.display = 'flex';
@@ -143,12 +143,12 @@
     }
 
     function logoutGoogle() {
-      localStorage.removeItem("SKT_USER_EMAIL");
+      sessionStorage.removeItem("SKT_USER_EMAIL");
       location.reload(); 
     }
 
     window.onload = function() {
-      if(localStorage.getItem("SKT_USER_EMAIL")) {
+      if(sessionStorage.getItem("SKT_USER_EMAIL")) {
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('instant-loader').style.display = 'flex';
         loadSystemModules();
@@ -209,4 +209,5 @@
   </script>
 </body>
 </html>
+
 
