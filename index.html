@@ -155,20 +155,21 @@
       }
     };
 
-    // --- TẢI CÁC MODULE HTML VỚI CHỐT CHẶN BÁO LỖI ---
+    // --- TẢI CÁC MODULE HTML VỚI CHỐT CHẶN VÀ CHỐNG CACHE ---
     async function loadSystemModules() {
       try {
-        // THÊM DẤU ./ ĐỂ ÉP ĐỌC FILE CÙNG THƯ MỤC
+        // Tuyệt chiêu chống Cache: Thêm chuỗi thời gian ngẫu nhiên vào đuôi link
+        const cacheBuster = "?v=" + new Date().getTime(); 
+        
         const [resNhapLieu, resTimKiem, resMinhChung] = await Promise.all([
-            fetch('./SKT_NhapLieu.html'),
-            fetch('./SKT_TimKiem.html'),
-            fetch('./SKT_MinhChung.html')
+            fetch('./SKT_NhapLieu.html' + cacheBuster),
+            fetch('./SKT_TimKiem.html' + cacheBuster),
+            fetch('./SKT_MinhChung.html' + cacheBuster)
         ]);
 
-        // CHỐT CHẶN: NẾU GITHUB TRẢ VỀ TRANG 404 THÌ DỪNG LẠI NGAY, KHÔNG ĐƯA VÀO GIAO DIỆN
-        if (!resNhapLieu.ok) throw new Error("Không tìm thấy file SKT_NhapLieu.html trên Github!");
-        if (!resTimKiem.ok) throw new Error("Không tìm thấy file SKT_TimKiem.html trên Github!");
-        if (!resMinhChung.ok) throw new Error("Không tìm thấy file SKT_MinhChung.html trên Github!");
+        if (!resNhapLieu.ok) throw new Error("Không tìm thấy file SKT_NhapLieu.html");
+        if (!resTimKiem.ok) throw new Error("Không tìm thấy file SKT_TimKiem.html");
+        if (!resMinhChung.ok) throw new Error("Không tìm thấy file SKT_MinhChung.html");
 
         document.getElementById('TabNhapLieu').innerHTML = await resNhapLieu.text();
         document.getElementById('TabTimKiem').innerHTML = await resTimKiem.text();
@@ -179,7 +180,7 @@
         executeScripts(document.getElementById('MinhChungContainer'));
 
       } catch (e) {
-        alert("LỖI KẾT NỐI TỆP: " + e.message + "\n\nThầy hãy kiểm tra lại xem tên các file con trên GitHub đã ghi chính xác chữ hoa, chữ thường chưa nhé!");
+        alert("LỖI KẾT NỐI TỆP: " + e.message + " trên Github!\n\nThầy hãy kiểm tra lại xem tên file trên GitHub đã có đúng đuôi .html và chính xác chữ hoa, chữ thường chưa nhé!");
       }
 
       setTimeout(function() { 
@@ -208,3 +209,4 @@
   </script>
 </body>
 </html>
+
