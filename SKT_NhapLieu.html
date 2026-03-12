@@ -1,23 +1,12 @@
 <style>
-  /* --- STYLE GIỮ NGUYÊN NHƯ CŨ --- */
-  .cell-input::placeholder {
-    color: #94a3b8 !important; opacity: 0.5; font-style: italic; font-size: 13px;
-  }
+  .cell-input::placeholder { color: #94a3b8 !important; opacity: 0.5; font-style: italic; font-size: 13px; }
   #mainTable .cell-input::placeholder { opacity: 0.45; }
-  
-  /* Style cho Select Box đẹp, gọn gàng */
-  select.cell-input {
-    appearance: none; -webkit-appearance: none;
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231e3a8a%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-    background-repeat: no-repeat; background-position: right 5px top 50%; background-size: 8px auto;
-    padding-right: 15px; text-align-last: center;
-  }
+  select.cell-input { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231e3a8a%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 5px top 50%; background-size: 8px auto; padding-right: 15px; text-align-last: center; }
 </style>
 
 <div id="main_content">
   <div class="header-card">
     <h1 style="text-align:center; color:var(--brand-red); margin-top:0;">SỔ KIỂM TRA NỘI BỘ TRƯỜNG TH&THCS HỢP THÀNH</h1>
-    
     <div class="filter-section">
       <div class="f-item"><span>Giáo viên</span><select id="cbGiaoVien" class="f-input" onchange="onUserChange('GV')"></select></div>
       <div class="f-item"><span>Người kiểm tra</span><select id="cbNguoiKiemTra" class="f-input" onchange="onUserChange('NKT')"></select></div>
@@ -63,11 +52,8 @@
       </thead>
       <tbody id="tableContent"></tbody>
     </table>
-    
     <div class="add-row-container">
-        <button type="button" class="btn-add-row" onclick="addNewRow()">
-           <span>➕</span> Thêm dòng
-        </button>
+        <button type="button" class="btn-add-row" onclick="addNewRow()"><span>➕</span> Thêm dòng</button>
     </div>
   </div>
 
@@ -86,10 +72,10 @@
     </div>
   </div>
   
-  <div id="modal_overlay">
-    <div id="modal_box">
-      <div id="modal_message"></div>
-      <button class="modal-btn" onclick="closeModal()">ĐÓNG</button>
+  <div id="modal_overlay_nhap" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <div id="modal_message_nhap" class="modal-text" style="font-weight:bold; margin-top:15px; font-size:16px;"></div>
+      <button class="btn-cancel" onclick="closeModal()">ĐÓNG</button>
     </div>
   </div>
 </div>
@@ -101,13 +87,9 @@
 
   function getCurrentDate() {
       const d = new Date();
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const year = d.getFullYear();
-      return `${day}/${month}/${year}`;
+      return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
   }
 
-  // ĐÃ CẬP NHẬT: Hiển thị nhiều tài liệu dưới dạng icon ghim
   function returnLinkToMain(url) {
       if (currentRowUpload) {
           const cell = currentRowUpload.querySelector('.evidence-cell');
@@ -120,21 +102,16 @@
               cell.classList.add('evidence-uploaded'); 
               if(uploadBtn) uploadBtn.style.display = 'none';
               
-              // Tách các link nếu có nhiều link
               const links = url.split(',').map(l => l.trim()).filter(l => l !== "");
               let htmlLinks = links.map((l, idx) => 
                   `<a href="${l}" target="_blank" style="display:block; text-decoration:none; color:#0369a1; background:#f0f9ff; border:1px solid #bae6fd; border-radius:4px; padding:4px; margin-bottom:4px; font-size:12px; font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="Xem tài liệu ${idx + 1}">📎 Tài liệu ${idx + 1}</a>`
               ).join('');
 
-              // Hiển thị danh sách link và nút Sửa/Thêm
               displayArea.innerHTML = `
-                <div style="max-height:85px; overflow-y:auto; padding:2px; text-align:left;">
-                    ${htmlLinks}
-                </div>
+                <div style="max-height:85px; overflow-y:auto; padding:2px; text-align:left;">${htmlLinks}</div>
                 <div style="text-align:center; margin-top:2px;">
                     <span class="link-edit-corner" onclick="triggerUpload(this)" title="Sửa hoặc thêm tài liệu" style="cursor:pointer; color:#b45309; font-size:11px; font-weight:bold; padding:2px 5px; background:#fef3c7; border-radius:3px; border:1px solid #fde68a; display:inline-block; width:100%; box-sizing:border-box;">✏️ Sửa / Thêm</span>
-                </div>
-              `;
+                </div>`;
           } else {
               input.value = "";
               cell.classList.remove('evidence-uploaded');
@@ -150,46 +127,30 @@
   function triggerUpload(btn) {
       const row = btn.closest('tr');
       const contentInput = row.querySelectorAll('.cell-input')[1]; 
-      
       if (!contentInput || !contentInput.value.trim()) {
           showModal("⚠️ Vui lòng nhập 'Nội dung' kiểm tra trước khi đính kèm minh chứng!");
           contentInput.focus(); return;
       }
-      
       currentRowUpload = row;
       const linkInput = row.querySelector('.link-input'); 
-      const linkCu = linkInput ? linkInput.value : "";  
-      
-      if (typeof openUploadModal === 'function') { 
-          openUploadModal(linkCu); 
-      } 
-      else { 
-          showModal("⚠️ Chưa tải được chức năng upload!"); 
-      }
+      if (typeof openUploadModal === 'function') openUploadModal(linkInput ? linkInput.value : ""); 
+      else showModal("⚠️ Chưa tải được chức năng upload!"); 
   }
 
   function reCheckEditPermission(row) {
-      const nkt = document.getElementById('cbNguoiKiemTra').value;
-      const isNKT = (nktData.find(x => x.name === nkt)?.email === userEmail);
+      const nkt = String(document.getElementById('cbNguoiKiemTra').value || "").trim();
+      const isNKT = nktData.some(x => x.name.trim() === nkt && x.email === userEmail);
       const editBtn = row.querySelector('.link-edit-corner');
       if(editBtn) {
           if(!isNKT) {
-              editBtn.classList.add('disabled');
-              editBtn.style.pointerEvents = 'none'; // Khóa click
-              editBtn.style.opacity = '0.5';        // Làm mờ
+              editBtn.classList.add('disabled'); editBtn.style.pointerEvents = 'none'; editBtn.style.opacity = '0.5'; 
           } else {
-              editBtn.classList.remove('disabled');
-              editBtn.style.pointerEvents = 'auto'; // Mở click
-              editBtn.style.opacity = '1';          // Rõ nét
+              editBtn.classList.remove('disabled'); editBtn.style.pointerEvents = 'auto'; editBtn.style.opacity = '1';
           }
       }
   }
 
-  window.onload = () => { 
-      addNewRow(); 
-      loadData(); 
-      if(typeof loadFolders === 'function') loadFolders(); 
-  };
+  window.onload = () => { addNewRow(); loadData(); if(typeof loadFolders === 'function') loadFolders(); };
 
   function loadData() {
     toggleSpin('initial', true);
@@ -211,6 +172,19 @@
       fillCombo('cbNguoiKiemTra', nktData); 
       fillComboSimple('cbBoPhan', Object.keys(bpData)); 
       updateMaHoSoCombo(); 
+
+      // TÍNH NĂNG PHÂN QUYỀN: KHÓA TÊN GIÁO VIÊN
+      let myGVName = gvData.find(x => x.email === userEmail)?.name;
+      let myNKTName = nktData.find(x => x.email === userEmail)?.name;
+      
+      if (myGVName && !myNKTName) {
+          const cbGV = document.getElementById('cbGiaoVien');
+          cbGV.value = myGVName;
+          cbGV.disabled = true; // Khóa chết 100%
+          updatePrefixAllRows();
+          applyPermissions();
+      }
+
       toggleSpin('initial', false); 
       setStatus(1);
     }).SKT_getInitialData();
@@ -226,7 +200,20 @@
         toggleSpin('full', false);
         if (r && r.length > 0) { 
             const isMultiRow = Array.isArray(r[0]); 
-            fillRecordToWeb(isMultiRow ? r : [r]); 
+            const records = isMultiRow ? r : [r];
+
+            // TÍNH NĂNG PHÂN QUYỀN CHỐT CHẶN: KHÔNG CHO MỞ HỒ SƠ NGƯỜI KHÁC (Đã cắt khoảng trắng)
+            let myGVName = gvData.find(x => x.email === userEmail)?.name;
+            let myNKTName = nktData.find(x => x.email === userEmail)?.name;
+            const recordGV = String(records[0][0] || "").trim(); // Lọc sạch khoảng trắng
+
+            if (myGVName && !myNKTName && recordGV !== myGVName) {
+                showModal("⛔ BẠN CHỈ ĐƯỢC XEM VÀ KÝ NHẬN HỒ SƠ CỦA CHÍNH MÌNH!");
+                resetForm(); 
+                return;
+            }
+
+            fillRecordToWeb(records); 
             setStatus(3); 
             ['cbGiaoVien','cbNguoiKiemTra','cbBoPhan'].forEach(id=>document.getElementById(id).disabled=true);
             setTimeout(() => { applyPermissions(); setStatus(4); }, 300);
@@ -236,18 +223,22 @@
   }
 
   function applyPermissions() {
-    const gv = document.getElementById('cbGiaoVien').value;
-    const nkt = document.getElementById('cbNguoiKiemTra').value;
+    // Đã thêm trim() để đọc chính xác tuyệt đối tên người trên Form
+    const gv = String(document.getElementById('cbGiaoVien').value || "").trim();
+    const nkt = String(document.getElementById('cbNguoiKiemTra').value || "").trim();
     const btnSave = document.getElementById('btnSave');
     const btnSubmit = document.getElementById('btnSubmit');
     const btnAddContainer = document.querySelector('.add-row-container'); 
     
-    const isGV = (gvData.find(x => x.name === gv)?.email === userEmail);
-    const isNKT = (nktData.find(x => x.name === nkt)?.email === userEmail);
+    // Tách biệt quyền: Kiểm tra chính xác ai đang đăng nhập
+    const isGV = gvData.some(x => x.name.trim() === gv && x.email === userEmail);
+    const isNKT = nktData.some(x => x.name.trim() === nkt && x.email === userEmail);
 
+    // Quyền của Người Kiểm Tra
     if (isNKT) { btnSubmit.disabled = false; btnSubmit.style.opacity = "1"; } 
     else { btnSubmit.disabled = true; btnSubmit.style.opacity = "0.5"; }
 
+    // Quyền chung (Cả 2 đều được lưu nhật ký)
     if (isGV || isNKT) { btnSave.disabled = false; btnSave.style.opacity = "1"; } 
     else { btnSave.disabled = true; btnSave.style.opacity = "0.5"; }
 
@@ -256,10 +247,18 @@
     document.querySelectorAll('#tableContent tr').forEach(row => {
         const ins = row.querySelectorAll('.cell-input');
         ins.forEach((c, i) => {
-            // Chú ý: Cột Ý kiến là vị trí 9, Ký tên là 10
-            if (isGV) c.disabled = !(i === 9 || i === 10); 
-            else if (isNKT) c.disabled = (i === 9 || i === 10); 
-            else c.disabled = true; 
+            const isYkienHoacKyTen = (i === 9 || i === 10);
+            
+            // Xử lý bật/tắt từng cột dựa trên đúng quyền hạn
+            if (isGV && isNKT) {
+                c.disabled = false; // Kiêm 2 vai trò: Sửa tất cả
+            } else if (isGV) {
+                c.disabled = !isYkienHoacKyTen; // Giáo viên: CHỈ MỞ KHÓA cột Ý kiến (9) và Ký tên (10)
+            } else if (isNKT) {
+                c.disabled = isYkienHoacKyTen; // Người KT: Khóa cột 9,10, mở khóa các cột còn lại
+            } else {
+                c.disabled = true; // Không có quyền: Khóa toàn bộ
+            }
         });
         
         const btnUp = row.querySelector('.btn-upload-icon');
@@ -267,20 +266,10 @@
         const btnEdit = row.querySelector('.link-edit-corner'); 
 
         if(btnUp) btnUp.disabled = !isNKT;
-        if(btnDel) {
-            btnDel.disabled = !isNKT;
-            btnDel.style.visibility = isNKT ? 'visible' : 'hidden';
-        }
+        if(btnDel) { btnDel.disabled = !isNKT; btnDel.style.visibility = isNKT ? 'visible' : 'hidden'; }
         if(btnEdit) {
-            if(!isNKT) {
-                btnEdit.classList.add('disabled');
-                btnEdit.style.pointerEvents = 'none';
-                btnEdit.style.opacity = '0.5';
-            } else {
-                btnEdit.classList.remove('disabled');
-                btnEdit.style.pointerEvents = 'auto';
-                btnEdit.style.opacity = '1';
-            }
+            if(!isNKT) { btnEdit.classList.add('disabled'); btnEdit.style.pointerEvents = 'none'; btnEdit.style.opacity = '0.5'; } 
+            else { btnEdit.classList.remove('disabled'); btnEdit.style.pointerEvents = 'auto'; btnEdit.style.opacity = '1'; }
         }
     });
 
@@ -299,26 +288,20 @@
     const optHS = '<option value=""></option><option value="Tốt">Tốt</option><option value="Khá">Khá</option><option value="TB">TB</option>';
     const optGD = '<option value=""></option><option value="Giỏi">Giỏi</option><option value="Khá">Khá</option><option value="TB">TB</option><option value="Yếu">Yếu</option>';
     const optKS = '<option value=""></option><option value="Tốt">Tốt</option><option value="Khá">Khá</option><option value="Đạt">Đạt</option><option value="Yếu">Yếu</option>';
-    
-    // ĐÃ THÊM: Các lựa chọn cho cột XL khác
     const optKhac = '<option value=""></option><option value="Tốt">Tốt</option><option value="Khá">Khá</option><option value="TB">TB</option><option value="Chưa đạt">Chưa đạt</option>';
 
     tr.innerHTML = `
-      <td style="text-align:center;vertical-align:middle">
-        <button class="btn-icon-del" onclick="removeRow(this)" title="Xóa dòng"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg></button>
-      </td>
+      <td style="text-align:center;vertical-align:middle"><button class="btn-icon-del" onclick="removeRow(this)" title="Xóa dòng">🗑️</button></td>
       <td style="text-align:center;vertical-align:middle" class="stt-cell"></td>
       <td><input class="cell-input text-center" value="${getCurrentDate()}" oninput="formatDay(event)" placeholder="dd/mm/yyyy" disabled></td>
       <td><textarea class="cell-input" rows="1" oninput="autoResize(this)" disabled></textarea></td>
       <td><textarea class="cell-input" rows="1" oninput="autoResize(this)" disabled></textarea></td>
       <td><textarea class="cell-input" rows="1" oninput="autoResize(this)" disabled></textarea></td>
       <td><textarea class="cell-input" rows="1" oninput="autoResize(this)" disabled></textarea></td>
-      
       <td><select class="cell-input text-center" disabled>${optHS}</select></td>
       <td><select class="cell-input text-center" disabled>${optGD}</select></td>
       <td><select class="cell-input text-center" disabled>${optKS}</select></td>
       <td><select class="cell-input text-center" disabled>${optKhac}</select></td>
-      
       <td><textarea class="cell-input text-center" rows="1" oninput="autoResize(this)" style="text-align:center; padding-top:10px;" placeholder="(Ý kiến của giáo viên)" disabled></textarea></td>
       <td><textarea class="cell-input text-center" rows="1" oninput="autoResize(this)" style="text-align:center; padding-top:10px; overflow:hidden;" placeholder="(Ghi họ và tên)" disabled></textarea></td>
       <td style="text-align:center;vertical-align:middle; padding:5px;" class="evidence-cell">
@@ -329,28 +312,13 @@
       <td class="ma-ho-so-cell">MS-${ts}-${randomId}</td>
     `;
     tbody.appendChild(tr);
-    updateSTT();
-    updatePrefixAllRows();
+    updateSTT(); updatePrefixAllRows();
     
     if(data) {
        const ins = tr.querySelectorAll('.cell-input');
-       ins[0].value = data[4]||""; // Time
-       ins[1].value = data[5]||""; // Noi dung
-       ins[2].value = data[6]||""; // Uu diem
-       ins[3].value = data[7]||""; // Ton tai
-       ins[4].value = data[8]||""; // Bien phap
-       
-       ins[5].value = data[9]||""; // XL HS
-       ins[6].value = data[10]||""; // XL GD
-       ins[7].value = data[11]||""; // XL KS
-       ins[8].value = data[12]||""; // XL Khac
-       
-       ins[9].value = data[13]||""; // Y kien
-       ins[10].value = data[14]||""; // Ky ten
-       
+       for(let j=0; j<=10; j++) ins[j].value = data[j+4] || ""; 
        const linkUrl = data[15]||"";
        if(linkUrl) { currentRowUpload = tr; returnLinkToMain(linkUrl); }
-       
        tr.querySelector('.ma-ho-so-cell').innerText = data[16]||`MS-${ts}-${randomId}`;
        tr.querySelectorAll('textarea').forEach(t => autoResize(t));
     }
@@ -368,14 +336,7 @@
     const dataToSend = [];
     document.querySelectorAll('#tableContent tr').forEach(r => {
         const ins = r.querySelectorAll('.cell-input');
-        dataToSend.push([
-             gv, nkt, bp, mabp, 
-             ins[0].value, ins[1].value, ins[2].value, ins[3].value, ins[4].value, 
-             ins[5].value, ins[6].value, ins[7].value, ins[8].value, 
-             ins[9].value, ins[10].value, 
-             ins[11].value, 
-             r.querySelector('.ma-ho-so-cell').innerText
-        ]);
+        dataToSend.push([gv, nkt, bp, mabp, ins[0].value, ins[1].value, ins[2].value, ins[3].value, ins[4].value, ins[5].value, ins[6].value, ins[7].value, ins[8].value, ins[9].value, ins[10].value, ins[11].value, r.querySelector('.ma-ho-so-cell').innerText]);
     });
     btn.disabled = true; btn.innerText = "⏳ XỬ LÝ..."; btn.classList.add('loading-spin');
     google.script.run.withSuccessHandler(r => {
@@ -392,35 +353,46 @@
     const eNKT = nktData.find(x => x.name === nkt)?.email;
     if (eGV && eNKT && eGV === eNKT) {
       showModal("⚠️ LỖI: Email người kiểm tra và giáo viên trùng nhau!");
-      document.getElementById(type === 'GV' ? 'cbGiaoVien' : 'cbNguoiKiemTra').value = ""; 
-      return true; 
+      document.getElementById(type === 'GV' ? 'cbGiaoVien' : 'cbNguoiKiemTra').value = ""; return true; 
     }
     return false;
   }
 
-  function updateSTT() { const rows = document.querySelectorAll('#tableContent tr'); rows.forEach((r, i) => r.querySelector('.stt-cell').innerText = i + 1); }
+  function updateSTT() { document.querySelectorAll('#tableContent tr').forEach((r, i) => r.querySelector('.stt-cell').innerText = i + 1); }
   function fillCombo(id, d) { const e = document.getElementById(id); e.innerHTML='<option value="">-- Chọn --</option>'; d.forEach(i=>e.add(new Option(i.name,i.name))); }
   function fillComboSimple(id, l) { const e = document.getElementById(id); e.innerHTML='<option value="">-- Chọn --</option>'; if(l) l.forEach(v=>v&&e.add(new Option(v,v))); }
   function updateMaBoPhan() { document.getElementById('txtMaBoPhan').value = bpData[document.getElementById('cbBoPhan').value]||""; }
-  function showModal(m) { document.getElementById('modal_message').innerText=m; document.getElementById('modal_overlay').style.display='flex'; }
-  function closeModal() { document.getElementById('modal_overlay').style.display='none'; }
+  function showModal(m) { document.getElementById('modal_message_nhap').innerText=m; document.getElementById('modal_overlay_nhap').style.display='flex'; }
+  function closeModal() { document.getElementById('modal_overlay_nhap').style.display='none'; }
   function autoResize(e) { e.style.height='auto'; e.style.height=e.scrollHeight+'px'; }
   function formatDay(e) { let v=e.target.value.replace(/\D/g,''); if(v.length>8)v=v.substring(0,8); let o=""; if(v.length>0)o+=v.substring(0,2); if(v.length>2)o+='/'+v.substring(2,4); if(v.length>4)o+='/'+v.substring(4,8); e.target.value=o; }
   function toggleSpin(t,l) { document.querySelectorAll('.f-input, .cell-input').forEach(i=>i.classList[l?'add':'remove']('loading-spin')); }
   function setStatus(s) { for(let i=1;i<=4;i++){ let e=document.getElementById('step'+i); if(e){ e.className='step'; if(i<s)e.classList.add('completed'); if(i===s)e.classList.add('active'); }}}
   
   function resetForm() {
-    ['cbGiaoVien', 'cbNguoiKiemTra', 'cbBoPhan', 'cbMaHoSo'].forEach(id => {
+    ['cbNguoiKiemTra', 'cbBoPhan', 'cbMaHoSo'].forEach(id => {
       const el = document.getElementById(id); if(el) { el.value = ""; el.disabled = false; }
     });
+    
+    let myGVName = gvData.find(x => x.email === userEmail)?.name;
+    let myNKTName = nktData.find(x => x.email === userEmail)?.name;
+    const cbGV = document.getElementById('cbGiaoVien');
+
+    if (myGVName && !myNKTName) {
+        cbGV.value = myGVName;
+        cbGV.disabled = true;
+    } else {
+        cbGV.value = "";
+        cbGV.disabled = false;
+    }
+
     document.getElementById('txtMaBoPhan').value = "";
     document.getElementById('tableContent').innerHTML = ""; 
     addNewRow(); setStatus(1);
   }
 
   function updateMaHoSoCombo() {
-    const cb = document.getElementById('cbMaHoSo');
-    const cur = cb.value;
+    const cb = document.getElementById('cbMaHoSo'); const cur = cb.value;
     cb.innerHTML = '<option value="">-- Chọn --</option>';
     if (maHoSoData && maHoSoData.length > 0) {
       const sorted = [...maHoSoData].sort().reverse();
@@ -431,8 +403,7 @@
   }
 
   function refreshMaHoSoList() {
-    const btn = document.getElementById('btnRefreshMaHoSo');
-    const txt = btn.innerHTML;
+    const btn = document.getElementById('btnRefreshMaHoSo'); const txt = btn.innerHTML;
     btn.disabled = true; btn.innerHTML = "⏳";
     google.script.run.withSuccessHandler(r => {
       btn.disabled = false; btn.innerHTML = txt;
@@ -442,13 +413,9 @@
   }
 
   function validateSave() {
-    if (!document.getElementById('cbGiaoVien').value || !document.getElementById('cbNguoiKiemTra').value || !document.getElementById('cbBoPhan').value) { 
-        showModal("⚠️ Chưa có đủ thông tin chung!"); return false; 
-    }
+    if (!document.getElementById('cbGiaoVien').value || !document.getElementById('cbNguoiKiemTra').value || !document.getElementById('cbBoPhan').value) { showModal("⚠️ Chưa có đủ thông tin chung!"); return false; }
     var firstContent = document.querySelectorAll('#tableContent tr')[0].querySelectorAll('.cell-input')[1]; 
-    if (!firstContent || !firstContent.value.trim()) { 
-        showModal("⚠️ Chưa có nội dung kiểm tra ở dòng 1!"); return false; 
-    }
+    if (!firstContent || !firstContent.value.trim()) { showModal("⚠️ Chưa có nội dung kiểm tra ở dòng 1!"); return false; }
     return true;
   }
 
@@ -466,20 +433,20 @@
   function fillRecordToWeb(records) {
     if(!records || records.length === 0) return;
     const r0 = records[0];
-    document.getElementById('cbGiaoVien').value = r0[0]||""; 
-    document.getElementById('cbNguoiKiemTra').value = r0[1]||"";
-    document.getElementById('cbBoPhan').value = r0[2]||""; 
-    document.getElementById('txtMaBoPhan').value = r0[3]||"";
-    document.getElementById('tableContent').innerHTML = "";
     
+    // Ép kiểu chuẩn: Xóa bỏ mọi khoảng trắng thừa trong CSDL để Web nhận diện được đúng người
+    document.getElementById('cbGiaoVien').value = String(r0[0]||"").trim(); 
+    document.getElementById('cbNguoiKiemTra').value = String(r0[1]||"").trim();
+    document.getElementById('cbBoPhan').value = String(r0[2]||"").trim(); 
+    document.getElementById('txtMaBoPhan').value = String(r0[3]||"").trim();
+    
+    document.getElementById('tableContent').innerHTML = "";
     records.forEach(rowData => addNewRow(rowData));
-
     document.querySelectorAll('textarea.cell-input').forEach(t => autoResize(t));
   }
 
   function updatePrefixAllRows() { 
-    const n = document.getElementById('cbGiaoVien').value;
-    if(!n) return;
+    const n = document.getElementById('cbGiaoVien').value; if(!n) return;
     const p = n.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g,'');
     document.querySelectorAll('.ma-ho-so-cell').forEach(c => {
         const currentText = c.innerText;
@@ -488,62 +455,29 @@
   }
 
   function removeRow(btn) {
-      const nkt = document.getElementById('cbNguoiKiemTra').value;
-      const isNKT = (nktData.find(x => x.name === nkt)?.email === userEmail);
+      const nkt = String(document.getElementById('cbNguoiKiemTra').value || "").trim();
+      const isNKT = nktData.some(x => x.name.trim() === nkt && x.email === userEmail);
       if (!isNKT) { showModal("⚠️ Bạn không có quyền xóa dòng này!"); return; }
       const tbody = document.getElementById('tableContent');
       if(tbody.rows.length <= 1) { showModal("⚠️ Phải giữ lại ít nhất một dòng!"); return; }
-      rowToDelete = btn.closest('tr');
-      document.getElementById('customConfirmModal').style.display = 'flex';
+      rowToDelete = btn.closest('tr'); document.getElementById('customConfirmModal').style.display = 'flex';
   }
 
   function closeConfirmModal() { rowToDelete = null; document.getElementById('customConfirmModal').style.display = 'none'; }
   function processDelete() {
       if (!rowToDelete) return;
-      
       const maHS = rowToDelete.querySelector('.ma-ho-so-cell').innerText;
       const btnDel = rowToDelete.querySelector('.btn-icon-del');
-      
-      if (btnDel) {
-         btnDel.setAttribute('data-original', btnDel.innerHTML);
-         btnDel.innerHTML = '<span class="loading-spin" style="display:inline-block;width:16px;height:16px;"></span>'; 
-         btnDel.disabled = true;
-      }
-      
+      if (btnDel) { btnDel.setAttribute('data-original', btnDel.innerHTML); btnDel.innerHTML = '⏳'; btnDel.disabled = true; }
       closeConfirmModal(); 
-      
       google.script.run.withSuccessHandler(function(response) {
           if (response === "SUCCESS") {
-              rowToDelete.style.transition = "all 0.5s ease";
-              rowToDelete.style.opacity = "0";
-              rowToDelete.style.transform = "translateX(50px)";
-              
-              setTimeout(() => {
-                  rowToDelete.remove();
-                  updateSTT();
-                  if(document.getElementById('tableContent').rows.length === 0) addNewRow();
-              }, 500);
-              
-          } else if (response === "NO_PERMISSION") {
-              showModal("⛔ Bạn không có quyền xóa dữ liệu này!");
-              resetDeleteBtn(btnDel);
-          } else {
-              showModal("❌ " + response); 
-              resetDeleteBtn(btnDel);
-          }
-      })
-      .withFailureHandler(function(err) {
-          showModal("❌ Lỗi kết nối: " + err);
-          resetDeleteBtn(btnDel);
-      })
-      .SKT_deleteSingleRowNhatKy(maHS);
+              rowToDelete.style.transition = "all 0.5s ease"; rowToDelete.style.opacity = "0"; rowToDelete.style.transform = "translateX(50px)";
+              setTimeout(() => { rowToDelete.remove(); updateSTT(); if(document.getElementById('tableContent').rows.length === 0) addNewRow(); }, 500);
+          } else if (response === "NO_PERMISSION") { showModal("⛔ Bạn không có quyền xóa dữ liệu này!"); resetDeleteBtn(btnDel);
+          } else { showModal("❌ " + response); resetDeleteBtn(btnDel); }
+      }).withFailureHandler(function(err) { showModal("❌ Lỗi kết nối: " + err); resetDeleteBtn(btnDel); }).SKT_deleteSingleRowNhatKy(maHS);
   }
 
-  function resetDeleteBtn(btn) {
-      if(btn) {
-          btn.innerHTML = btn.getAttribute('data-original') || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>';
-          btn.disabled = false;
-      }
-      rowToDelete = null;
-  }
+  function resetDeleteBtn(btn) { if(btn) { btn.innerHTML = btn.getAttribute('data-original') || '🗑️'; btn.disabled = false; } rowToDelete = null; }
 </script>
